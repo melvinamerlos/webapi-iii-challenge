@@ -2,21 +2,27 @@
 
 // require the express npm module, needs to be added to the project using "yarn add" or "npm install"
 const express = require('express');
+const posts = require('./data/helpers/postDb');
+const users = require('./data/helpers/userDb');
 
 // creates an express application using the express module
 const server = express();
-
+server.use(express.json());
 const port = 9000;
 
-// configures our server to execute a function for every GET request to "/"
-// the second argument passed to the .get() method is the "Route Handler Function"
-// the route handler function will run on every GET request to "/"
-server.get("/", (req, res) => {
-  // express will pass the request and response objects to this function
-  // the .send() on the response object can be used to send a response to the client
-  
-  // sending back a 200 OK status code communicates to the client making the request that the operation was successful
-    res.status(200).send("Hello, World!");
+const errorHelper = (status, message, res) => {
+    res.status(status).json({ error: message });
+  };
+
+server.get('/api/users', (req, res) => {
+users
+    .get()
+    .then(foundUsers => {
+    res.json(foundUsers);
+    })
+    .catch(err => {
+    return errorHelper(500, 'Database boof', res);
+    });
 });
 
 // once the server is fully configured we can have it "listen" for connections on a particular "port"
